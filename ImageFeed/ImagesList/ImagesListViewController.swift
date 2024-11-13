@@ -1,13 +1,15 @@
 import UIKit
 
 class ImagesListViewController: UIViewController {
-@IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Do any additional setup after loading the view.
+        tableView.rowHeight = 200
     }
+    
+    func configCell(for cell: ImagesListCell) { }
 }
 
 extension ImagesListViewController: UITableViewDataSource {
@@ -16,7 +18,14 @@ extension ImagesListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
+        
+        guard let imageListCell = cell as? ImagesListCell else {
+            return UITableViewCell()
+        }
+        
+        configCell(for: imageListCell)
+        return imageListCell
     }
 }
 
