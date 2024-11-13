@@ -65,6 +65,11 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <outlet property="cellImage" destination="daX-d6-2zS" id="dF0-1y-Lep"/>
+                                            <outlet property="dateLabel" destination="mJs-FR-j79" id="gEH-GO-YNs"/>
+                                            <outlet property="likeButton" destination="v0Z-I6-wBS" id="spN-Im-2mt"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
