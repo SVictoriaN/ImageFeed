@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="E5j-Li-R2o">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -94,11 +94,96 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="64.885496183206101" y="-34.507042253521128"/>
+            <point key="canvasLocation" x="-883" y="-175"/>
+        </scene>
+        <!--Profile-->
+        <scene sceneID="mSw-wW-9PJ">
+            <objects>
+                <viewController title="Profile" id="E5j-Li-R2o" customClass="ProfileViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="aEt-hm-kNz">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="avatar" translatesAutoresizingMaskIntoConstraints="NO" id="ERr-qL-5ll" userLabel="Avatar Image View">
+                                <rect key="frame" x="16" y="80" width="70" height="70"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="ERr-qL-5ll" secondAttribute="height" multiplier="1:1" id="2WN-yH-kBR"/>
+                                    <constraint firstAttribute="width" constant="70" id="odP-PZ-A0m"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="35"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Екатерина Новикова" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ANz-7K-iN0" userLabel="Name Label">
+                                <rect key="frame" x="16" y="158" width="361" height="37"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="23"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="@ekaterina_nov" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="97t-uL-HTv" userLabel="Login Name Label">
+                                <rect key="frame" x="16" y="203" width="107" height="16"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" red="0.68235294117647061" green="0.68627450980392157" blue="0.70588235294117641" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Hello, World!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7FS-BA-mWP" userLabel="Description Label">
+                                <rect key="frame" x="16" y="232" width="88" height="16"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sg1-gG-wjv" userLabel="Logout Button">
+                                <rect key="frame" x="333" y="104" width="44" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="44" id="6OY-q9-hlc"/>
+                                    <constraint firstAttribute="height" constant="44" id="Qk6-ZZ-S6W"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="logout_button"/>
+                                <connections>
+                                    <action selector="didTapLogoutButton:" destination="E5j-Li-R2o" eventType="touchUpInside" id="JjH-T3-8CX"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="mjD-EY-Hsx"/>
+                        <color key="backgroundColor" red="0.1019607843" green="0.1058823529" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="ERr-qL-5ll" firstAttribute="leading" secondItem="mjD-EY-Hsx" secondAttribute="leading" constant="16" id="0Hz-eJ-196"/>
+                            <constraint firstItem="7FS-BA-mWP" firstAttribute="trailing" secondItem="97t-uL-HTv" secondAttribute="trailing" id="FRf-0M-Xue"/>
+                            <constraint firstItem="7FS-BA-mWP" firstAttribute="top" secondItem="97t-uL-HTv" secondAttribute="bottom" constant="8" id="GgV-uH-f1c"/>
+                            <constraint firstItem="7FS-BA-mWP" firstAttribute="leading" secondItem="97t-uL-HTv" secondAttribute="leading" id="Nhv-bK-3d4"/>
+                            <constraint firstItem="97t-uL-HTv" firstAttribute="top" secondItem="ANz-7K-iN0" secondAttribute="bottom" constant="8" id="Tiq-0n-Lhz"/>
+                            <constraint firstItem="Sg1-gG-wjv" firstAttribute="centerY" secondItem="ERr-qL-5ll" secondAttribute="centerY" id="ZoR-wc-CFL"/>
+                            <constraint firstItem="ANz-7K-iN0" firstAttribute="leading" secondItem="ERr-qL-5ll" secondAttribute="leading" id="cXk-WM-hGR"/>
+                            <constraint firstItem="mjD-EY-Hsx" firstAttribute="right" secondItem="ANz-7K-iN0" secondAttribute="right" constant="16" id="lRt-8h-zMq"/>
+                            <constraint firstItem="ERr-qL-5ll" firstAttribute="top" secondItem="mjD-EY-Hsx" secondAttribute="top" constant="32" id="mgQ-NZ-WY2"/>
+                            <constraint firstItem="mjD-EY-Hsx" firstAttribute="trailing" secondItem="Sg1-gG-wjv" secondAttribute="trailing" constant="16" id="nmK-Nd-Aug"/>
+                            <constraint firstItem="97t-uL-HTv" firstAttribute="leading" secondItem="ANz-7K-iN0" secondAttribute="leading" id="qZC-XA-SDR"/>
+                            <constraint firstItem="ANz-7K-iN0" firstAttribute="top" secondItem="ERr-qL-5ll" secondAttribute="bottom" constant="8" id="ulM-hY-7Fn"/>
+                            <constraint firstItem="97t-uL-HTv" firstAttribute="trailing" secondItem="ANz-7K-iN0" secondAttribute="trailing" id="xxx-a6-zCE"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="5ol-lU-LkE"/>
+                    <connections>
+                        <outlet property="avatarImageView" destination="ERr-qL-5ll" id="arT-yu-ek5"/>
+                        <outlet property="descriptionLabel" destination="7FS-BA-mWP" id="WpU-pO-Dei"/>
+                        <outlet property="loginNameLabel" destination="97t-uL-HTv" id="vXJ-DY-oD2"/>
+                        <outlet property="logoutButton" destination="Sg1-gG-wjv" id="Rrc-jL-Fx8"/>
+                        <outlet property="nameLabel" destination="ANz-7K-iN0" id="PFU-ME-JKm"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6tS-83-5tb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2028.2442748091603" y="-175.35211267605635"/>
         </scene>
     </scenes>
     <resources>
         <image name="0" width="1600" height="1059"/>
+        <image name="avatar" width="70" height="70"/>
         <image name="like_button_on" width="29.333333969116211" height="26"/>
+        <image name="logout_button" width="24" height="24"/>
     </resources>
 </document>
