@@ -1,6 +1,6 @@
 import UIKit
 
-class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController {
         
         private var avatarImageView: UIImageView!
         private var nameLabel: UILabel!
@@ -80,6 +80,7 @@ class ProfileViewController: UIViewController {
             with: UIImage(named: "logout_button")!,
             target:self,
             action:#selector(didTapLogoutButton))
+        logoutButton.tintColor = .red
         
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoutButton)
