@@ -3,46 +3,46 @@ import UIKit
 final class ProfileViewController: UIViewController {
     
     private lazy var avatarImageView: UIImageView = {
-         let view = UIImageView()
-         let image = UIImage(named: "avatar")
-         view.image = image
-         view.layer.cornerRadius = 35
-         view.clipsToBounds = true
-         return view
-     }()
-     
-     private lazy var nameLabel: UILabel = {
-         let label = UILabel()
-         label.text = "Екатерина Новикова"
-         label.textColor = .white
-         label.font = UIFont.boldSystemFont(ofSize: 23)
-         return label
-     }()
-     
-     private lazy var loginNameLabel: UILabel = {
-         let label = UILabel()
-         label.textColor = .gray
-         label.text = "@ekaterina_nov"
-         label.font = UIFont.systemFont(ofSize: 13)
-         return label
-     }()
-     
-     private lazy var descriptionLabel: UILabel = {
-         let label = UILabel()
-         label.textColor = .white
-         label.text = "Hello, world!"
-         label.font = UIFont.systemFont(ofSize: 13)
-         return label
-     }()
-     
-     private lazy var logoutButton: UIButton = {
-         let button = UIButton.systemButton(
-             with: UIImage(named: "logout_button")!,
-             target: self,
-             action: #selector(didTapLogoutButton))
-         button.tintColor = .red
-         return button
-     }()
+        let view = UIImageView()
+        let image = UIImage(named: "avatar")
+        view.image = image
+        view.layer.cornerRadius = 35
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    private lazy var nameLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Екатерина Новикова"
+        label.textColor = .white
+        label.font = UIFont.boldSystemFont(ofSize: 23)
+        return label
+    }()
+    
+    private lazy var loginNameLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .gray
+        label.text = "@ekaterina_nov"
+        label.font = UIFont.systemFont(ofSize: 13)
+        return label
+    }()
+    
+    private lazy var descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.text = "Hello, world!"
+        label.font = UIFont.systemFont(ofSize: 13)
+        return label
+    }()
+    
+    private lazy var logoutButton: UIButton = {
+        let button = UIButton.systemButton(
+            with: UIImage(named: "logout_button")!,
+            target: self,
+            action: #selector(didTapLogoutButton))
+        button.tintColor = UIColor(red: 0xF5/255.0, green: 0x6B/255.0, blue: 0x6C/255.0, alpha: 1.0)
+        return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
