@@ -2,16 +2,47 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    private let avatarImageView: UIImageView = {
-        let view = UIImageView()
-        let image = UIImage(named: "avatar")
-        view.image = image
-        return view
-    }()
-    private var nameLabel: UILabel!
-    private var loginNameLabel: UILabel!
-    private var descriptionLabel: UILabel!
-    private var logoutButton: UIButton!
+    private lazy var avatarImageView: UIImageView = {
+         let view = UIImageView()
+         let image = UIImage(named: "avatar")
+         view.image = image
+         view.layer.cornerRadius = 35
+         view.clipsToBounds = true
+         return view
+     }()
+     
+     private lazy var nameLabel: UILabel = {
+         let label = UILabel()
+         label.text = "Екатерина Новикова"
+         label.textColor = .white
+         label.font = UIFont.boldSystemFont(ofSize: 23)
+         return label
+     }()
+     
+     private lazy var loginNameLabel: UILabel = {
+         let label = UILabel()
+         label.textColor = .gray
+         label.text = "@ekaterina_nov"
+         label.font = UIFont.systemFont(ofSize: 13)
+         return label
+     }()
+     
+     private lazy var descriptionLabel: UILabel = {
+         let label = UILabel()
+         label.textColor = .white
+         label.text = "Hello, world!"
+         label.font = UIFont.systemFont(ofSize: 13)
+         return label
+     }()
+     
+     private lazy var logoutButton: UIButton = {
+         let button = UIButton.systemButton(
+             with: UIImage(named: "logout_button")!,
+             target: self,
+             action: #selector(didTapLogoutButton))
+         button.tintColor = .red
+         return button
+     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,27 +51,6 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupViews() {
-        nameLabel = UILabel()
-        nameLabel.text = "Екатерина Новикова"
-        nameLabel.textColor = .white
-        nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
-        
-        loginNameLabel = UILabel()
-        loginNameLabel.textColor = .gray
-        loginNameLabel.text = "@ekaterina_nov"
-        loginNameLabel.font = UIFont.systemFont(ofSize: 13)
-        
-        descriptionLabel = UILabel()
-        descriptionLabel.textColor = .white
-        descriptionLabel.text = "Hello, world!"
-        descriptionLabel.font = UIFont.systemFont(ofSize: 13)
-        
-        logoutButton = UIButton.systemButton(
-            with: UIImage(named: "logout_button")!,
-            target:self,
-            action:#selector(didTapLogoutButton))
-        logoutButton.tintColor = .red
-        
         [avatarImageView, nameLabel, loginNameLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -71,8 +81,6 @@ final class ProfileViewController: UIViewController {
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: avatarImageView.centerYAnchor)
         ])
-        avatarImageView.layer.cornerRadius = 35
-        avatarImageView.clipsToBounds = true
     }
     
     @objc
