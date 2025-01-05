@@ -15,6 +15,7 @@ final class WebViewViewController: UIViewController {
     @IBOutlet private var progressView: UIProgressView!
     
     weak var delegate: WebViewViewControllerDelegate?
+    private var isLoading = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,7 +81,6 @@ final class WebViewViewController: UIViewController {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
-    
 }
 
 extension WebViewViewController: WKNavigationDelegate {
@@ -90,8 +90,10 @@ extension WebViewViewController: WKNavigationDelegate {
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
         if let code = code(from: navigationAction) {
+            showLoadingIndicator()
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
+            hideLoadingIndicator()
         } else {
             decisionHandler(.allow)
         }
@@ -109,6 +111,18 @@ extension WebViewViewController: WKNavigationDelegate {
         } else {
             return nil
         }
+    }
+    
+    private func showLoadingIndicator() {
+        guard !isLoading else { return }
+        isLoading = true
+        UIBlockingProgressHUD.show()
+    }
+    
+    private func hideLoadingIndicator() {
+        guard isLoading else { return }
+        isLoading = false
+        UIBlockingProgressHUD.dismiss()
     }
 }
 
