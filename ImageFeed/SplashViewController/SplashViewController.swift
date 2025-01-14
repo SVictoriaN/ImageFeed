@@ -6,6 +6,7 @@ final class SplashViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
     private let oauth2TokenStorage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
+    private var username: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -14,8 +15,8 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if OAuth2TokenStorage.shared.token != nil {
-            switchToTabBarController()
+        if let token = OAuth2TokenStorage.shared.token {
+            fetchProfile(token)
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
@@ -39,18 +40,31 @@ final class SplashViewController: UIViewController {
     
     private func fetchProfile(_ token: String) {
         UIBlockingProgressHUD.show()
-        profileService.fetchProfile(token) { [weak self] result in
+        
+        ProfileService.shared.fetchProfile(token) { [weak self] result in
+            
+            print(">>> [ProfileService] Fetching profile...")
+            
             UIBlockingProgressHUD.dismiss()
             
-            guard let self = self else { return }
+            guard let self else { return }
             
             switch result {
-            case .success:
-                self.switchToTabBarController()
-                
+            case .success(let profile):
+                username = profile.username
+                guard let username else { return }
+                ProfileImageService.shared.fetchProfileImageURL(username: username) {  result in
+                    switch result {
+                    case .success(let url):
+                        print(">>> [ProfileImageService] Profile image URL: (url)")
+                    case .failure:
+                        print(">>> [ProfileImageService] Error fetching profile image: (error.localizedDescription)")
+                    }
+                 }
+                print(">>> [SplashViewController] Fetching profile completed")
+                switchToTabBarController()
             case .failure:
-                print("Error fetching profile: (error.localizedDescription)")
-                break
+                print(">>> [SplashViewController] Fetching profile failed")
             }
         }
     }
@@ -87,10 +101,15 @@ extension SplashViewController: AuthViewControllerDelegate {
             guard let self = self else { return }
             switch result {
             case .success:
-                self.switchToTabBarController()
-            case .failure:
-                // TODO [Sprint 11]
-                break
+                print(">>> [SplashViewController] OAuth token fetched successfully.")
+                if let token = self.oauth2TokenStorage.token {
+                    self.fetchProfile(token)
+                } else {
+                    print("No token found after fetching OAuth token.")
+                }
+            case .failure(let error):
+                print("Error fetching OAuth token: (error.localizedDescription)")
+                // TODO [Sprint 11]-алерт
             }
         }
     }
@@ -99,27 +118,10 @@ extension SplashViewController: AuthViewControllerDelegate {
         vc.dismiss(animated: true)
         
         guard let token = oauth2TokenStorage.token else {
+            print("No token available after authentication.")
             return
         }
         
         fetchProfile(token)
     }
-    
-    /*private func fetchProfile(_ token: String) {
-        UIBlockingProgressHUD.show()
-        profileService.fetchProfile(token) { [weak self] result in
-            UIBlockingProgressHUD.dismiss()
-            
-            guard let self = self else { return }
-            
-            switch result {
-            case .success:
-                self.switchToTabBarController()
-                
-            case .failure:
-                print("Error fetching profile: (error.localizedDescription)")
-                break
-            }
-        }
-    }*/
 }

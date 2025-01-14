@@ -1,12 +1,14 @@
 import UIKit
 import Foundation
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
     private lazy var avatarImageView: UIImageView = {
         let view = UIImageView()
-        let image = UIImage(named: "avatar")
-        view.image = image
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.tintColor = .gray
+        view.image = UIImage(systemName: "person.crop.circle.fill")
         view.layer.cornerRadius = 35
         view.clipsToBounds = true
         return view
@@ -14,7 +16,6 @@ final class ProfileViewController: UIViewController {
     
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
-        //label.text = "Екатерина Новикова"
         label.textColor = .white
         label.font = UIFont.boldSystemFont(ofSize: 23)
         return label
@@ -23,7 +24,6 @@ final class ProfileViewController: UIViewController {
     private lazy var loginNameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .gray
-        //label.text = "@ekaterina_nov"
         label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
@@ -31,7 +31,6 @@ final class ProfileViewController: UIViewController {
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
-        //label.text = "Hello, world!"
         label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
@@ -45,15 +44,26 @@ final class ProfileViewController: UIViewController {
         return button
     }()
     
-    private let profile = ProfileService.shared.profile
-    private let profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         setupСonstraints()
         
-        loadProfile()
+        guard let profile = ProfileService.shared.profile else { return }
+        updateProfileDetails(profile: profile)
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
     }
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -92,48 +102,27 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func loadProfile() {
-            // Здесь нужно передать токен для загрузки профиля
-        guard let token = OAuth2TokenStorage.shared.token else {
-                    print("Token is missing.")
-                    return
-                }
-
-            profileService.fetchProfile(token) { [weak self] result in
-                switch result {
-                case .success(let profile):
-                    DispatchQueue.main.async {
-                        self?.updateProfileDetails(with: profile)
-                    }
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        print("Ошибка при загрузке профиля: (error)")
-                        self?.loginNameLabel.text = "Неизвестный пользователь"
-                        self?.descriptionLabel.text = "Нет информации"
-                    }
-                }
-            }
-        }
-        
-        @objc private func profileUpdated() {
-            // Обновляем данные при получении уведомления
-            if let updatedProfile = profileService.profile {
-                updateProfileDetails(with: updatedProfile)
-            }
-        }
-        
-        func updateProfileDetails(with profile: Profile?) {
-            
-            guard let profile = profile else {
-                loginNameLabel.text = "Неизвестный пользователь"
-                descriptionLabel.text = "Нет информации"
-                return
-            }
-            
-            nameLabel.text = profile.name
-            loginNameLabel.text = profile.loginName
-            descriptionLabel.text = profile.bio
-        }
+    private func updateProfileDetails(profile: Profile) {
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        avatarImageView.kf.indicatorType = .activity
+        let processor = DownsamplingImageProcessor(size: avatarImageView.bounds.size)
+        avatarImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "person.crop.circle.fill"),
+            options: [
+                .processor(processor),
+                .transition(.fade(1))
+            ])
+    }
     
     @objc
     private func didTapLogoutButton() {

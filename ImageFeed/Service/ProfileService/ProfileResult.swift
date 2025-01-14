@@ -8,8 +8,8 @@ struct ProfileResult: Codable {
 
     enum CodingKeys: String, CodingKey {
         case username
-        case firstName = "first_name"
-        case lastName = "last_name"
+        case firstName
+        case lastName 
         case bio
     }
 }

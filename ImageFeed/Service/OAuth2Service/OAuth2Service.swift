@@ -19,7 +19,6 @@ final class OAuth2Service {
     private let decoder = JSONDecoder()
     private var task: URLSessionTask?
     private var lastCode: String?
-    private let queue = DispatchQueue(label: "OAuth2ServiceQueue")
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let baseURL = URL(string: "https://unsplash.com") else {
@@ -52,47 +51,35 @@ final class OAuth2Service {
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        queue.sync {
-            if task != nil, lastCode == code {
-                return
-            } else {
-                task?.cancel()
-            }
-            
-            lastCode = code
-            
-            guard let request = makeOAuthTokenRequest(code: code) else {
-                completion(.failure(AuthServiceError.invalidRequest))
-                return
-            }
-            
-            task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-                defer { self?.task = nil }
-                
-                DispatchQueue.main.async {
-                    if let error = error {
-                        print("Ошибка сети: (error.localizedDescription)")
-                        completion(.failure(error))
-                        return
-                    }
-                    
-                    guard let data = data else {
-                        completion(.failure(AuthServiceError.noData))
-                        return
-                    }
-                    
-                    do {
-                        let tokenResponse = try self?.decoder.decode(OAuthTokenResponseBody.self, from: data)
-                        let token = tokenResponse?.accessToken ?? ""
-                        self?.authToken = token
-                        completion(.success(token))
-                    } catch {
-                        completion(.failure(AuthServiceError.decodingError(error)))
-                    }
-                }
-            }
-            task?.resume()
+        guard task == nil || lastCode != code else {
+            let error = AuthServiceError.duplicateRequest
+            print("[fetchOAuthToken]: (error.localizedDescription) - Запрос с этим кодом уже выполняется")
+            completion(.failure(error))
+            return
         }
+        
+        task?.cancel()
+        lastCode = code
+        
+        guard let request = makeOAuthTokenRequest(code: code) else {
+            let error = AuthServiceError.invalidRequest
+            print("[fetchOAuthToken]: (error.localizedDescription) - Неверный запрос")
+            completion(.failure(error))
+            return
+        }
+        
+        task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+            switch result {
+            case .success(let tokenResponse):
+                self?.authToken = tokenResponse.accessToken
+                completion(.success(tokenResponse.accessToken))
+            case .failure(let error):
+                print("[fetchOAuthToken]: (error.localizedDescription) - Ошибка декодирования")
+                completion(.failure(error))
+            }
+        }
+        
+        task?.resume()
     }
 }
 
