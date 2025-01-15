@@ -1,5 +1,6 @@
 import UIKit
 import Foundation
+import SwiftKeychainWrapper
 
 final class SplashViewController: UIViewController {
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
@@ -55,7 +56,7 @@ final class SplashViewController: UIViewController {
                 guard let username else { return }
                 ProfileImageService.shared.fetchProfileImageURL(username: username) {  result in
                     switch result {
-                    case .success(let url):
+                    case .success:
                         print(">>> [ProfileImageService] Profile image URL: (url)")
                     case .failure:
                         print(">>> [ProfileImageService] Error fetching profile image: (error.localizedDescription)")
@@ -100,7 +101,7 @@ extension SplashViewController: AuthViewControllerDelegate {
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success:
+            case .success(let url):
                 print(">>> [SplashViewController] OAuth token fetched successfully.")
                 if let token = self.oauth2TokenStorage.token {
                     self.fetchProfile(token)

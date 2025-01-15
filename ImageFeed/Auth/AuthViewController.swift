@@ -1,5 +1,6 @@
 import UIKit
 import ProgressHUD
+//import SwiftKeychainWrapper
 
 protocol AuthViewControllerDelegate: AnyObject {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String)
@@ -52,6 +53,7 @@ final class AuthViewController: UIViewController {
         present(alert, animated: true)
         
     }
+    
 }
 
 extension AuthViewController: WebViewViewControllerDelegate {
@@ -84,3 +86,4 @@ extension AuthViewController {
         }
     }
 }
+    
