@@ -48,6 +48,8 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 1.0)
+        
         setupViews()
         setupСonstraints()
         
@@ -69,6 +71,7 @@ final class ProfileViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    // MARK: - Private Methods    
     private func setupViews() {
         [avatarImageView, nameLabel, loginNameLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false

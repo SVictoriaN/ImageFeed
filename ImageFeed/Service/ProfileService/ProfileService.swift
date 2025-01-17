@@ -7,6 +7,7 @@ final class ProfileService {
     private var task: URLSessionTask?
     private(set) var profile: Profile?
     
+    // MARK: - Private Methods
     private func makeProfileServiceRequest(token: String) -> URLRequest? {
         guard let url = URL(string: Constants.defaultURL + "me") else {
             print("ProfileService: func makeRequestToProfile(...)")

@@ -61,11 +61,23 @@ final class SplashViewController: UIViewController {
                     case .failure:
                         print(">>> [ProfileImageService] Error fetching profile image: (error.localizedDescription)")
                     }
-                 }
+                }
                 print(">>> [SplashViewController] Fetching profile completed")
                 switchToTabBarController()
             case .failure:
                 print(">>> [SplashViewController] Fetching profile failed")
+                let alert = UIAlertController(title: "Что-то пошло не так(",
+                                              message: "Не удалось войти в систему",
+                                              preferredStyle: .alert)
+                
+                let action = UIAlertAction(title: "Ок", style: .default) { _ in
+                    self.dismiss(animated: true)
+                }
+                alert.addAction(action)
+                
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true)
+                }
             }
         }
     }
@@ -110,10 +122,11 @@ extension SplashViewController: AuthViewControllerDelegate {
                 }
             case .failure(let error):
                 print("Error fetching OAuth token: (error.localizedDescription)")
-                // TODO [Sprint 11]-алерт
             }
         }
     }
+    
+    
     
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)

@@ -170,22 +170,6 @@
             </objects>
             <point key="canvasLocation" x="-1802" y="351"/>
         </scene>
-        <!--Profile-->
-        <scene sceneID="mSw-wW-9PJ">
-            <objects>
-                <viewController storyboardIdentifier="ProfileViewController" title="Profile" id="E5j-Li-R2o" customClass="ProfileViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="aEt-hm-kNz">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="mjD-EY-Hsx"/>
-                        <color key="backgroundColor" red="0.1019607843" green="0.1058823529" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </view>
-                    <tabBarItem key="tabBarItem" title="" image="tab_profile_active" id="Erl-BZ-OtH"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="6tS-83-5tb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-2802" y="-357"/>
-        </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="owl-IG-brV">
             <objects>
@@ -361,7 +345,6 @@
         <image name="share_button" width="50" height="50"/>
         <image name="splash_screen_logo" width="75" height="78"/>
         <image name="tab_editorial_active" width="75" height="49"/>
-        <image name="tab_profile_active" width="75" height="49"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
