@@ -4,7 +4,7 @@ struct UserResult: Decodable {
     let profileImage: ProfileImage?
     
     enum CodingKeys: String, CodingKey {
-        case profileImage //= "profile_image"
+        case profileImage 
     }
     
     struct ProfileImage: Decodable {
