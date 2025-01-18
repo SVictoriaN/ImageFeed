@@ -56,20 +56,17 @@ final class ProfileViewController: UIViewController {
         guard let profile = ProfileService.shared.profile else { return }
         updateProfileDetails(profile: profile)
         
-        profileImageServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ProfileImageService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                guard let self = self else { return }
-                self.updateAvatar()
-            }
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+                    forName: ProfileImageService.didChangeNotification,
+                    object: nil,
+                    queue: .main
+                ) { [weak self] notification in
+                    guard let self = self else { return }
+                    self.updateAvatar()
+                }
         updateAvatar()
     }
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+
     
     // MARK: - Private Methods    
     private func setupViews() {

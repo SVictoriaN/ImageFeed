@@ -43,7 +43,7 @@ final class SplashViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .white
         view.addSubview(splashImageView)
-
+        
         NSLayoutConstraint.activate([
             splashImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             splashImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -53,18 +53,18 @@ final class SplashViewController: UIViewController {
     }
     
     private func switchToAuthViewController() {
-            let storyboard = UIStoryboard(name: "Main", bundle: .main)
-
-            guard let authViewController = storyboard.instantiateViewController(
-                withIdentifier: "AuthViewController"
-            ) as? AuthViewController else { return }
-            
-            authViewController.delegate = self
-
-            let navigationController = UINavigationController(rootViewController: authViewController)
-            navigationController.modalPresentationStyle = .fullScreen
-            present(navigationController, animated: true, completion: nil)
-        }
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+        
+        guard let authViewController = storyboard.instantiateViewController(
+            withIdentifier: "AuthViewController"
+        ) as? AuthViewController else { return }
+        
+        authViewController.delegate = self
+        
+        let navigationController = UINavigationController(rootViewController: authViewController)
+        navigationController.modalPresentationStyle = .fullScreen
+        present(navigationController, animated: true, completion: nil)
+    }
     
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
@@ -104,8 +104,8 @@ final class SplashViewController: UIViewController {
                                               message: "Не удалось войти в систему",
                                               preferredStyle: .alert)
                 
-                let action = UIAlertAction(title: "Ок", style: .default) { _ in
-                    self.dismiss(animated: true)
+                let action = UIAlertAction(title: "Ок", style: .default) { [weak self] _ in
+                    self?.dismiss(animated: true)
                 }
                 alert.addAction(action)
                 

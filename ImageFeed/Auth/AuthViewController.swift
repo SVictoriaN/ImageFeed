@@ -44,9 +44,8 @@ final class AuthViewController: UIViewController {
                                       message: "Не удалось войти в систему",
                                       preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Ок",
-                                   style: .default){ _ in
-            self.dismiss(animated: true)
+        let action = UIAlertAction(title: "Ок", style: .default) { [weak self] _ in
+            self?.dismiss(animated: true)
         }
         alert.addAction(action)
         
@@ -86,4 +85,4 @@ extension AuthViewController {
         }
     }
 }
-    
+

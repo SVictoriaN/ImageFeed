@@ -47,8 +47,8 @@ final class ProfileImageService {
         }
         
         let urlSession = URLSession.shared
-        let task = urlSession.objectTask(for: request) { (result: Result<UserResult, Error>) in
-            defer { self.task = nil }
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
+            guard let self = self else { return }
             switch result {
             case .success(let userImage):
                 let profileImageURL = userImage.profileImage?.small
