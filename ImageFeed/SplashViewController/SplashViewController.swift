@@ -129,14 +129,14 @@ extension SplashViewController: AuthViewControllerDelegate {
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success(let url):
+            case .success:
                 print(">>> [SplashViewController] OAuth token fetched successfully.")
                 if let token = self.oauth2TokenStorage.token {
                     self.fetchProfile(token)
                 } else {
                     print("No token found after fetching OAuth token.")
                 }
-            case .failure(let error):
+            case .failure:
                 print("Error fetching OAuth token: (error.localizedDescription)")
             }
         }
