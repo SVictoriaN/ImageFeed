@@ -15,13 +15,24 @@ final class WebViewViewController: UIViewController {
     @IBOutlet private var progressView: UIProgressView!
     
     weak var delegate: WebViewViewControllerDelegate?
+    private var isLoading = false
+    private var estimatedProgressObservation: NSKeyValueObservation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         webView.navigationDelegate = self
         
+        estimatedProgressObservation = webView.observe(
+            \.estimatedProgress,
+             options: [.new],
+             changeHandler: { [weak self] _, _ in
+                 self?.updateProgress()
+             })
+        
         loadAuthView()
+    }
+    deinit {
+        estimatedProgressObservation?.invalidate()
     }
     
     private func loadAuthView() {
@@ -48,39 +59,10 @@ final class WebViewViewController: UIViewController {
         delegate?.webViewViewControllerDidCancel(self)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
-        updateProgress()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
-    }
-    
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?
-    ) {
-        if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            updateProgress()
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
-    }
-    
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
-    
 }
 
 extension WebViewViewController: WKNavigationDelegate {
@@ -90,8 +72,10 @@ extension WebViewViewController: WKNavigationDelegate {
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
         if let code = code(from: navigationAction) {
+            showLoadingIndicator()
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
+            hideLoadingIndicator()
         } else {
             decisionHandler(.allow)
         }
@@ -109,6 +93,18 @@ extension WebViewViewController: WKNavigationDelegate {
         } else {
             return nil
         }
+    }
+    
+    private func showLoadingIndicator() {
+        guard !isLoading else { return }
+        isLoading = true
+        UIBlockingProgressHUD.show()
+    }
+    
+    private func hideLoadingIndicator() {
+        guard isLoading else { return }
+        isLoading = false
+        UIBlockingProgressHUD.dismiss()
     }
 }
 

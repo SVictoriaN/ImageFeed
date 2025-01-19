@@ -1,11 +1,14 @@
 import UIKit
+import Foundation
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
     private lazy var avatarImageView: UIImageView = {
         let view = UIImageView()
-        let image = UIImage(named: "avatar")
-        view.image = image
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.tintColor = .gray
+        view.image = UIImage(systemName: "person.crop.circle.fill")
         view.layer.cornerRadius = 35
         view.clipsToBounds = true
         return view
@@ -13,7 +16,6 @@ final class ProfileViewController: UIViewController {
     
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "Екатерина Новикова"
         label.textColor = .white
         label.font = UIFont.boldSystemFont(ofSize: 23)
         return label
@@ -22,7 +24,6 @@ final class ProfileViewController: UIViewController {
     private lazy var loginNameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .gray
-        label.text = "@ekaterina_nov"
         label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
@@ -30,7 +31,6 @@ final class ProfileViewController: UIViewController {
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
-        label.text = "Hello, world!"
         label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
@@ -44,12 +44,31 @@ final class ProfileViewController: UIViewController {
         return button
     }()
     
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 1.0)
+        
         setupViews()
         setupСonstraints()
+        
+        guard let profile = ProfileService.shared.profile else { return }
+        updateProfileDetails(profile: profile)
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+                    forName: ProfileImageService.didChangeNotification,
+                    object: nil,
+                    queue: .main
+                ) { [weak self] notification in
+                    guard let self = self else { return }
+                    self.updateAvatar()
+                }
+        updateAvatar()
     }
+
     
+    // MARK: - Private Methods    
     private func setupViews() {
         [avatarImageView, nameLabel, loginNameLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -81,6 +100,28 @@ final class ProfileViewController: UIViewController {
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: avatarImageView.centerYAnchor)
         ])
+    }
+    
+    private func updateProfileDetails(profile: Profile) {
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        avatarImageView.kf.indicatorType = .activity
+        let processor = DownsamplingImageProcessor(size: avatarImageView.bounds.size)
+        avatarImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "person.crop.circle.fill"),
+            options: [
+                .processor(processor),
+                .transition(.fade(1))
+            ])
     }
     
     @objc
