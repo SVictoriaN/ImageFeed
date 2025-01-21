@@ -1,9 +1,11 @@
 import Foundation
 
 final class ProfileService {
+    // MARK: - Singleton Instance
     static let shared = ProfileService()
     private init() {}
     
+    // MARK: - Properties
     private var task: URLSessionTask?
     private(set) var profile: Profile?
     
@@ -20,18 +22,19 @@ final class ProfileService {
         return request
     }
     
+    // MARK: - Public Methods
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         if task != nil {
             print("[fetchProfile]: (error.localizedDescription) - Запрос уже выполняется")
-            completion(.failure(ProfileServiceError.extraRequest))
+            completion(.failure(ServiceError.extraRequest))
             return
         }
         
         guard let request = makeProfileServiceRequest(token: token) else {
             print("[fetchProfile]: (error.localizedDescription) - Неверный запрос")
-            completion(.failure(ProfileServiceError.invalidRequest))
+            completion(.failure(ServiceError.invalidRequest))
             return
         }
         

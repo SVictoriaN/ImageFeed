@@ -3,7 +3,7 @@ import Foundation
 import Kingfisher
 
 final class ProfileViewController: UIViewController {
-    
+    // MARK: - Properties
     private lazy var avatarImageView: UIImageView = {
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -46,6 +46,7 @@ final class ProfileViewController: UIViewController {
     
     private var profileImageServiceObserver: NSObjectProtocol?
     
+    // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 1.0)
@@ -67,7 +68,6 @@ final class ProfileViewController: UIViewController {
         updateAvatar()
     }
 
-    
     // MARK: - Private Methods    
     private func setupViews() {
         [avatarImageView, nameLabel, loginNameLabel, descriptionLabel, logoutButton].forEach {

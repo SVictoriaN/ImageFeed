@@ -2,10 +2,12 @@ import UIKit
 import Foundation
 
 final class OAuth2Service {
+    // MARK: - Singleton Instance
     static let shared = OAuth2Service()
     
     private init() { }
     
+    // MARK: - Properties
     var authToken: String? {
         get {
             return OAuth2TokenStorage.shared.token
@@ -20,6 +22,7 @@ final class OAuth2Service {
     private var task: URLSessionTask?
     private var lastCode: String?
     
+    // MARK: - Private Methods
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let baseURL = URL(string: "https://unsplash.com") else {
             assertionFailure("Failed to create URL")
@@ -48,6 +51,7 @@ final class OAuth2Service {
         return request
     }
     
+    // MARK: - Public Methods
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         

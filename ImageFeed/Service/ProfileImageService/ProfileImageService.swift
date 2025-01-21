@@ -1,14 +1,18 @@
 import Foundation
 
 final class ProfileImageService {
+    // MARK: - Notifications
     static let didChangeNotification = Notification.Name("ProfileImageServiceDidChangeNotification")
     
+    // MARK: - Singleton Instance
     static let shared = ProfileImageService()
     private init() {}
     
+    // MARK: - Properties
     private var task: URLSessionTask?
     private(set) var avatarURL: String?
     
+    // MARK: - Private Methods
     private func makeProfileImageRequest(username: String) -> URLRequest? {
         guard
             let token = OAuth2TokenStorage.shared.token
@@ -29,12 +33,13 @@ final class ProfileImageService {
         return request
     }
     
+    // MARK: - Public Methods
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         if task != nil {
             print("[fetchProfile]: (error.localizedDescription) - Запрос уже выполняется")
-            completion(.failure(ProfileServiceError.extraRequest))
+            completion(.failure(ServiceError.extraRequest))
             return
         }
         
@@ -42,7 +47,7 @@ final class ProfileImageService {
             let request = makeProfileImageRequest(username: username)
         else {
             print("[fetchProfile]: (error.localizedDescription) - Неверный запрос")
-            completion(.failure(ProfileServiceError.invalidRequest))
+            completion(.failure(ServiceError.invalidRequest))
             return
         }
         

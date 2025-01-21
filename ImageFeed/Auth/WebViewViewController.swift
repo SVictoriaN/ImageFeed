@@ -5,19 +5,23 @@ enum WebViewConstants {
     static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
 }
 
+// MARK: - Protocols
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
 final class WebViewViewController: UIViewController {
+    // MARK: - Outlets
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
     
+    // MARK: - Properties
     weak var delegate: WebViewViewControllerDelegate?
     private var isLoading = false
     private var estimatedProgressObservation: NSKeyValueObservation?
     
+    // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         webView.navigationDelegate = self
@@ -35,6 +39,7 @@ final class WebViewViewController: UIViewController {
         estimatedProgressObservation?.invalidate()
     }
     
+    // MARK: - Private Methods
     private func loadAuthView() {
         guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else {
             return
@@ -55,16 +60,19 @@ final class WebViewViewController: UIViewController {
         webView.load(request)
     }
     
+    // MARK: - Actions
     @IBAction private func didTapBackButton(_ sender: Any) {
         delegate?.webViewViewControllerDidCancel(self)
     }
     
+    // MARK: - Progress Handling
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
 }
 
+// MARK: - WKNavigationDelegate
 extension WebViewViewController: WKNavigationDelegate {
     func webView(
         _ webView: WKWebView,
