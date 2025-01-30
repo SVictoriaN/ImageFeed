@@ -5,17 +5,9 @@ final class ImagesListViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     private let photosName: [String] = Array(0..<20).map{ "\($0)" }
-   // private let currentDate = Date()
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
-    
-    /*private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    }()*/
     
     private var imagesListServiceObserver: NSObjectProtocol?
     
@@ -99,6 +91,8 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        imageListCell.delegate = self
+        
         configCell(for: imageListCell, with: indexPath)
         return imageListCell
     }
@@ -122,9 +116,7 @@ extension ImagesListViewController {
             cell.dateLabel.text = "Дата не указана"
         }
         
-        let isLiked = indexPath.row % 2 == 0
-        let likeImage = isLiked ? UIImage(named: "like_button_on") : UIImage(named: "like_button_off")
-        cell.likeButton.setImage(likeImage, for: .normal)
+        cell.setIsLiked(photo.isLiked)
     }
 }
 
@@ -150,3 +142,37 @@ extension ImagesListViewController: UITableViewDelegate {
     }
 }
 
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        
+        UIBlockingProgressHUD.show()
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
+            switch result {
+            case .success:
+                
+                self.photos = self.imagesListService.photos
+                
+                cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                
+                UIBlockingProgressHUD.dismiss()
+            case .failure:
+                
+                UIBlockingProgressHUD.dismiss()
+                
+                let alert = UIAlertController(title: "Что-то пошло не так(",
+                                              message: "Не удалось выполнить действие.",
+                                              preferredStyle: .alert)
+                
+                let action = UIAlertAction(title: "Ок", style: .default) { [weak self] _ in
+                    self?.dismiss(animated: true)
+                }
+                alert.addAction(action)
+                
+                self.present(alert, animated: true)
+            }
+        }
+    }
+}

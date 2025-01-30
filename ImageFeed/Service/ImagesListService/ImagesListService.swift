@@ -29,6 +29,21 @@ final class ImagesListService {
         return request
     }
     
+    private func makeImagesListLikeRequest(_ token: String, _ photoId: String, _ isLike: Bool) -> URLRequest? {
+        guard let urlComponents = URLComponents(string: Constants.defaultURL + "photos/\(photoId)/like")
+        else {
+            print("ImagesListService: func makeImagesListLikeRequest(...)")
+            return nil
+        }
+        
+        guard let url = urlComponents.url else { return nil }
+        
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = isLike ? "POST" : "DELETE"
+        return request
+    }
+    
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
         assert(Thread.isMainThread)
         
@@ -90,6 +105,45 @@ final class ImagesListService {
         }
         
         self.task = task
+        task.resume()
+    }
+    
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void){
+        guard
+            let token = OAuth2TokenStorage.shared.token
+        else { return }
+        
+        guard let request = makeImagesListLikeRequest(token, photoId, isLike) else {
+            print(">>> [ImagesListService] Failed to create the request")
+            completion(.failure(ServiceError.invalidRequest))
+            return
+        }
+        
+        let urlSession = URLSession.shared
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<PhotoWrapper, Error>) in
+            guard let self else { return }
+            switch result {
+            case .success(_):
+                if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
+                    let photo = self.photos[index]
+                    let newPhoto = Photo(
+                        id: photo.id,
+                        size: photo.size,
+                        createdAt: photo.createdAt,
+                        welcomeDescription: photo.welcomeDescription,
+                        thumbImageURL: photo.thumbImageURL,
+                        largeImageURL: photo.largeImageURL,
+                        isLiked: !photo.isLiked
+                    )
+                    self.photos[index] = newPhoto
+                }
+                completion(.success(()))
+            case .failure(let error):
+                print(">>> [ImagesListService] Failed to get data with like")
+                completion(.failure(error))
+            }
+        }
+        
         task.resume()
     }
 }

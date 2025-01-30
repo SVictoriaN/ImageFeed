@@ -9,3 +9,8 @@ struct PhotoResult: Decodable {
     let description: String?
     let urls: UrlsResult
 }
+
+
+struct PhotoWrapper: Decodable {
+    let photo: PhotoResult
+}
