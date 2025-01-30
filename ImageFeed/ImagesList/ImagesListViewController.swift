@@ -5,17 +5,17 @@ final class ImagesListViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     private let photosName: [String] = Array(0..<20).map{ "\($0)" }
-    private let currentDate = Date()
+   // private let currentDate = Date()
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
     
-    private lazy var dateFormatter: DateFormatter = {
+    /*private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
         formatter.timeStyle = .none
         return formatter
-    }()
+    }()*/
     
     private var imagesListServiceObserver: NSObjectProtocol?
     
@@ -58,7 +58,7 @@ final class ImagesListViewController: UIViewController {
     
     func updateTableViewAnimated() {
         let oldCount = photos.count
-        photos = imagesListService.photos // Обновляем массив фотографий из сервиса
+        photos = imagesListService.photos
         let newCount = photos.count
         
         if oldCount != newCount {
@@ -73,7 +73,7 @@ final class ImagesListViewController: UIViewController {
             } completion: { _ in }
         }
         
-        tableView.reloadData() // Перезагружаем данные таблицы
+        tableView.reloadData()
     }
     
     @objc private func didChangePhotos(notification: Notification) {
@@ -106,22 +106,21 @@ extension ImagesListViewController: UITableViewDataSource {
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let photo = photos[indexPath.row] // Получаем объект Photo из массива
+        let photo = photos[indexPath.row]
         
-        // Используем Kingfisher для загрузки изображения по URL
-        // Преобразование строки в URL
         if let url = URL(string: photo.thumbImageURL) {
             cell.cellImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.transition(.fade(0.2))])
         } else {
-            // Если URL недействителен, устанавливаем изображение-заглушку
             cell.cellImage.image = UIImage(named: "placeholder")
         }
         
-        // Настройка индикатора загрузки
         cell.cellImage.kf.indicatorType = .activity
         
-        // Настройка даты
-        cell.dateLabel.text = dateFormatter.string(from: currentDate)
+        if let createdAt = photo.createdAt {
+            cell.dateLabel.text = createdAt.toFormattedDate() ?? "Неверная дата"
+        } else {
+            cell.dateLabel.text = "Дата не указана"
+        }
         
         let isLiked = indexPath.row % 2 == 0
         let likeImage = isLiked ? UIImage(named: "like_button_on") : UIImage(named: "like_button_off")
@@ -140,10 +139,6 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        //guard let image = UIImage(named: photosName[indexPath.row]) else {
-        //    return 0
-       // }
-        
         let image = photos[indexPath.row]
         
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
