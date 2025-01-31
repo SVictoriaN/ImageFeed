@@ -18,6 +18,7 @@ final class ImagesListViewController: UIViewController {
         tableView.delegate = self
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         
+        
         imagesListService.fetchPhotosNextPage { _ in }
         
         imagesListServiceObserver = NotificationCenter.default
@@ -103,9 +104,9 @@ extension ImagesListViewController {
         let photo = photos[indexPath.row]
         
         if let url = URL(string: photo.thumbImageURL) {
-            cell.cellImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.transition(.fade(0.2))])
+            cell.cellImage.kf.setImage(with: url, placeholder: UIImage(named: "Stub"), options: [.transition(.fade(0.2))])
         } else {
-            cell.cellImage.image = UIImage(named: "placeholder")
+            cell.cellImage.image = UIImage(named: "Stub")
         }
         
         cell.cellImage.kf.indicatorType = .activity
