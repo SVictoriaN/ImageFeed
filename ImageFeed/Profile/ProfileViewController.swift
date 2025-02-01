@@ -58,17 +58,17 @@ final class ProfileViewController: UIViewController {
         updateProfileDetails(profile: profile)
         
         profileImageServiceObserver = NotificationCenter.default.addObserver(
-                    forName: ProfileImageService.didChangeNotification,
-                    object: nil,
-                    queue: .main
-                ) { [weak self] notification in
-                    guard let self = self else { return }
-                    self.updateAvatar()
-                }
+            forName: ProfileImageService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.updateAvatar()
+        }
         updateAvatar()
     }
-
-    // MARK: - Private Methods    
+    
+    // MARK: - Private Methods
     private func setupViews() {
         [avatarImageView, nameLabel, loginNameLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -127,5 +127,20 @@ final class ProfileViewController: UIViewController {
     @objc
     private func didTapLogoutButton() {
         // TODO: - Добавить логику нажатия на кнопку Logout
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        let logOutAction = UIAlertAction(title: "Да", style: .default) { _ in
+            ProfileLogoutService.shared.logout()
+        }
+        let closeAlertAction = UIAlertAction(title: "Нет", style: .default) { _ in
+            self.dismiss(animated: true)
+        }
+        
+        [logOutAction, closeAlertAction].forEach { alert.addAction($0) }
+        present(alert, animated: true)
     }
 }

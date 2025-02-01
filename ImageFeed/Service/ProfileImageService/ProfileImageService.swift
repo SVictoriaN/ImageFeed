@@ -64,7 +64,7 @@ final class ProfileImageService {
                     NotificationCenter.default.post(
                         name: ProfileImageService.didChangeNotification,
                         object: self,
-                        userInfo: ["URL": url] 
+                        userInfo: ["URL": url]
                     )
                     completion(.success(url))
                 } else {
@@ -80,6 +80,10 @@ final class ProfileImageService {
         
         self.task = task
         task.resume()
+    }
+    
+    func clearProfileImage() {
+        avatarURL = nil
     }
 }
 
