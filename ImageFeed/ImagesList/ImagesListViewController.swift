@@ -8,7 +8,6 @@ final class ImagesListViewController: UIViewController {
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
-    
     private var imagesListServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
@@ -42,8 +41,10 @@ final class ImagesListViewController: UIViewController {
                 assertionFailure("Invalid segue destination")
                 return
             }
-            let image = UIImage(named: photosName[indexPath.row])
-            viewController.image = image
+
+            let imageUrl = photos[indexPath.row] .largeImageURL
+            viewController.fullImageURL = imageUrl
+            
         } else {
             super.prepare(for: segue, sender: sender)
         }
