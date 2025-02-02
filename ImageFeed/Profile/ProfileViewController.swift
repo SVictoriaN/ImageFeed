@@ -45,6 +45,7 @@ final class ProfileViewController: UIViewController {
     }()
     
     private var profileImageServiceObserver: NSObjectProtocol?
+    private var gradientLayer: CAGradientLayer?
     
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
@@ -66,6 +67,8 @@ final class ProfileViewController: UIViewController {
             self.updateAvatar()
         }
         updateAvatar()
+        
+        addGradientLayer()
     }
     
     // MARK: - Private Methods
@@ -124,9 +127,37 @@ final class ProfileViewController: UIViewController {
             ])
     }
     
+    private func addGradientLayer() {
+        gradientLayer = CAGradientLayer()
+        
+        gradientLayer?.frame = avatarImageView.bounds
+        gradientLayer?.colors = [
+            UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
+            UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
+            UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
+        ]
+        
+        gradientLayer?.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer?.endPoint = CGPoint(x: 1, y: 0.5)
+        
+        if let gradientLayer = gradientLayer {
+            avatarImageView.layer.addSublayer(gradientLayer)
+            animateGradientLayer(gradientLayer)
+        }
+    }
+    
+    private func animateGradientLayer(_ layer: CAGradientLayer) {
+        let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
+        gradientChangeAnimation.duration = 1.0
+        gradientChangeAnimation.repeatCount = .infinity
+        gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
+        gradientChangeAnimation.toValue = [0, 0.8, 1]
+        
+        layer.add(gradientChangeAnimation, forKey: "locationsChange")
+    }
+    
     @objc
     private func didTapLogoutButton() {
-        // TODO: - Добавить логику нажатия на кнопку Logout
         let alert = UIAlertController(
             title: "Пока, пока!",
             message: "Уверены что хотите выйти?",
