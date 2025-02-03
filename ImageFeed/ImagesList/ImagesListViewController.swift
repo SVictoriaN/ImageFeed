@@ -4,12 +4,23 @@ import Kingfisher
 final class ImagesListViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
-    private let photosName: [String] = Array(0..<20).map{ "\($0)" }
+    //private let photosName: [String] = Array(0..<20).map{ "\($0)" }
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
     private var imagesListServiceObserver: NSObjectProtocol?
     private var gradientLayer: CAGradientLayer?
+    
+    private let iso8601DateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        return formatter
+    }()
+    
+    private let outputDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM yyyy"
+        return formatter
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,7 +110,7 @@ final class ImagesListViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-
+        
         gradientLayer?.frame = view.bounds
     }
 }
@@ -138,12 +149,17 @@ extension ImagesListViewController {
         cell.cellImage.kf.indicatorType = .activity
         
         if let createdAt = photo.createdAt {
-            cell.dateLabel.text = createdAt.toFormattedDate() ?? "Неверная дата"
+            cell.dateLabel.text = toFormattedDate(from: createdAt) ?? "Неверная дата"
         } else {
-            cell.dateLabel.text = "Дата не указана"
+            cell.dateLabel.text = ""
         }
         
         cell.setIsLiked(photo.isLiked)
+    }
+    
+    private func toFormattedDate(from dateString: String) -> String? {
+        guard let date = iso8601DateFormatter.date(from: dateString) else { return nil }
+        return outputDateFormatter.string(from: date)
     }
 }
 
@@ -171,7 +187,6 @@ extension ImagesListViewController: UITableViewDelegate {
 
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
-        
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
         
@@ -179,14 +194,10 @@ extension ImagesListViewController: ImagesListCellDelegate {
         imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
             switch result {
             case .success:
-                
                 self.photos = self.imagesListService.photos
-                
                 cell.setIsLiked(self.photos[indexPath.row].isLiked)
-                
                 UIBlockingProgressHUD.dismiss()
             case .failure:
-                
                 UIBlockingProgressHUD.dismiss()
                 
                 let alert = UIAlertController(title: "Что-то пошло не так(",

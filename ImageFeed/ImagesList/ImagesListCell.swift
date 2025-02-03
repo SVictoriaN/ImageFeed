@@ -23,7 +23,7 @@ final class ImagesListCell: UITableViewCell {
         fullsizeImageView.kf.cancelDownloadTask()
     }
     
-    @IBAction func likeButtonClicked(_ sender: Any) {
+    @IBAction private func likeButtonClicked(_ sender: Any) {
         delegate?.imageListCellDidTapLike(self)
     }
     
