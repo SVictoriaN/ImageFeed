@@ -22,6 +22,27 @@ final class ImagesListViewController: UIViewController {
         return formatter
     }()
     
+    private let placeholderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        let imageView = UIImageView(image: UIImage(named: "placeholder"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(imageView)
+        
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 100), // Ширина значка
+            imageView.heightAnchor.constraint(equalToConstant: 100) // Высота значка
+        ])
+        
+        return view
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -43,6 +64,8 @@ final class ImagesListViewController: UIViewController {
                 print(">>> [ImagesListViewController] Notification received, updating photos")
                 self.updateTableViewAnimated()
             }
+        
+        setupPlaceholderView()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -63,6 +86,7 @@ final class ImagesListViewController: UIViewController {
         }
     }
     
+    
     func updateTableViewAnimated() {
         let oldCount = photos.count
         photos = imagesListService.photos
@@ -81,6 +105,20 @@ final class ImagesListViewController: UIViewController {
         }
         
         tableView.reloadData()
+        updatePlaceholderVisibility()
+    }
+    
+    private func setupPlaceholderView() {
+        view.addSubview(placeholderView)
+        
+        NSLayoutConstraint.activate([
+            placeholderView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            placeholderView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            placeholderView.topAnchor.constraint(equalTo: view.topAnchor),
+            placeholderView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        placeholderView.isHidden = true
     }
     
     @objc private func didChangePhotos(notification: Notification) {
@@ -182,6 +220,12 @@ extension ImagesListViewController: UITableViewDelegate {
         let scale = imageViewWidth / imageWidth
         let cellHeight = image.size.height * scale + imageInsets.top + imageInsets.bottom
         return cellHeight
+    }
+    
+    private func updatePlaceholderVisibility() {
+        let hasPhotos = !photos.isEmpty
+        placeholderView.isHidden = hasPhotos 
+        tableView.isHidden = !hasPhotos
     }
 }
 
