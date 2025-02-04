@@ -3,6 +3,7 @@ import Foundation
 import SwiftKeychainWrapper
 
 final class SplashViewController: UIViewController {
+    // MARK: - Properties
     private let splashImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -16,7 +17,8 @@ final class SplashViewController: UIViewController {
     private let oauth2TokenStorage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
     private var username: String?
-    
+   
+    // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -40,6 +42,7 @@ final class SplashViewController: UIViewController {
         .lightContent
     }
     
+    // MARK: - Private Methods 
     private func setupUI() {
         view.backgroundColor = .white
         view.addSubview(splashImageView)
@@ -117,6 +120,7 @@ final class SplashViewController: UIViewController {
     }
 }
 
+// MARK: - AuthViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         dismiss(animated: true) { [weak self] in

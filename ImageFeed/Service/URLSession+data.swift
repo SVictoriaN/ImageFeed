@@ -6,7 +6,7 @@ enum NetworkError: Error {
     case urlSessionError
 }
 
-enum ProfileServiceError: Error {
+enum ServiceError: Error {
     case extraRequest
     case invalidRequest
     case invalidData(String)
@@ -59,11 +59,11 @@ extension URLSession {
                                     >>> [objectTask] Network error. Decoding failed: \(error.localizedDescription)
                                         Received data: \(invalidData)
                                     """)
-                    completion(.failure(ProfileServiceError.invalidData(invalidData)))
+                    completion(.failure(ServiceError.invalidData(invalidData)))
                 }
             case .failure(let error):
                 print(">>> [dataTask] Network error. No data to decode: \(error.localizedDescription)")
-                completion(.failure(ProfileServiceError.noData))
+                completion(.failure(ServiceError.noData))
             }
         }
         return task

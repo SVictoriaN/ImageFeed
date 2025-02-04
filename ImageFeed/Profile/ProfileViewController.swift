@@ -3,7 +3,7 @@ import Foundation
 import Kingfisher
 
 final class ProfileViewController: UIViewController {
-    
+    // MARK: - Properties
     private lazy var avatarImageView: UIImageView = {
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -45,7 +45,9 @@ final class ProfileViewController: UIViewController {
     }()
     
     private var profileImageServiceObserver: NSObjectProtocol?
+    private var gradientLayer: CAGradientLayer?
     
+    // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 1.0)
@@ -57,18 +59,19 @@ final class ProfileViewController: UIViewController {
         updateProfileDetails(profile: profile)
         
         profileImageServiceObserver = NotificationCenter.default.addObserver(
-                    forName: ProfileImageService.didChangeNotification,
-                    object: nil,
-                    queue: .main
-                ) { [weak self] notification in
-                    guard let self = self else { return }
-                    self.updateAvatar()
-                }
+            forName: ProfileImageService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.updateAvatar()
+        }
         updateAvatar()
+        
+        addGradientLayer()
     }
-
     
-    // MARK: - Private Methods    
+    // MARK: - Private Methods
     private func setupViews() {
         [avatarImageView, nameLabel, loginNameLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -124,8 +127,51 @@ final class ProfileViewController: UIViewController {
             ])
     }
     
+    private func addGradientLayer() {
+        gradientLayer = CAGradientLayer()
+        
+        gradientLayer?.frame = avatarImageView.bounds
+        gradientLayer?.colors = [
+            UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
+            UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
+            UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
+        ]
+        
+        gradientLayer?.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer?.endPoint = CGPoint(x: 1, y: 0.5)
+        
+        if let gradientLayer = gradientLayer {
+            avatarImageView.layer.addSublayer(gradientLayer)
+            animateGradientLayer(gradientLayer)
+        }
+    }
+    
+    private func animateGradientLayer(_ layer: CAGradientLayer) {
+        let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
+        gradientChangeAnimation.duration = 1.0
+        gradientChangeAnimation.repeatCount = .infinity
+        gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
+        gradientChangeAnimation.toValue = [0, 0.8, 1]
+        
+        layer.add(gradientChangeAnimation, forKey: "locationsChange")
+    }
+    
     @objc
     private func didTapLogoutButton() {
-        // TODO: - Добавить логику нажатия на кнопку Logout
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        let logOutAction = UIAlertAction(title: "Да", style: .default) { _ in
+            ProfileLogoutService.shared.logout()
+        }
+        let closeAlertAction = UIAlertAction(title: "Нет", style: .default) { _ in
+            self.dismiss(animated: true)
+        }
+        
+        [logOutAction, closeAlertAction].forEach { alert.addAction($0) }
+        present(alert, animated: true)
     }
 }
