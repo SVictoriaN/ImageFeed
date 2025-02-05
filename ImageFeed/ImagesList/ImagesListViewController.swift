@@ -36,8 +36,8 @@ final class ImagesListViewController: UIViewController {
         NSLayoutConstraint.activate([
             imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            imageView.widthAnchor.constraint(equalToConstant: 100), // Ширина значка
-            imageView.heightAnchor.constraint(equalToConstant: 100) // Высота значка
+            imageView.widthAnchor.constraint(equalToConstant: 100), 
+            imageView.heightAnchor.constraint(equalToConstant: 100)
         ])
         
         return view
@@ -49,8 +49,6 @@ final class ImagesListViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        
-        addGradientLayer()
         
         imagesListService.fetchPhotosNextPage { _ in }
         
@@ -128,28 +126,6 @@ final class ImagesListViewController: UIViewController {
             self.photos = updatedPhotos
             self.tableView.reloadData()
         }
-    }
-    
-    private func addGradientLayer() {
-        gradientLayer = CAGradientLayer()
-        gradientLayer?.colors = [
-            UIColor(red: 0.1, green: 0.2, blue: 0.3, alpha: 1).cgColor,
-            UIColor(red: 0.5, green: 0.6, blue: 0.7, alpha: 1).cgColor
-        ]
-        gradientLayer?.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer?.endPoint = CGPoint(x: 1, y: 1)
-        
-        gradientLayer?.frame = view.bounds
-        
-        if let gradientLayer = gradientLayer {
-            view.layer.insertSublayer(gradientLayer, at: 0)
-        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        gradientLayer?.frame = view.bounds
     }
 }
 

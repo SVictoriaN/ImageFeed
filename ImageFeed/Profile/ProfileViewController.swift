@@ -2,8 +2,11 @@ import UIKit
 import Foundation
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     // MARK: - Properties
+    var presenter: ProfilePresenterProtocol?
+    var profileImageServiceObserver: NSObjectProtocol?
+    
     private lazy var avatarImageView: UIImageView = {
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -44,9 +47,6 @@ final class ProfileViewController: UIViewController {
         return button
     }()
     
-    private var profileImageServiceObserver: NSObjectProtocol?
-    private var gradientLayer: CAGradientLayer?
-    
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,20 +55,27 @@ final class ProfileViewController: UIViewController {
         setupViews()
         setupСonstraints()
         
-        guard let profile = ProfileService.shared.profile else { return }
-        updateProfileDetails(profile: profile)
+        presenter?.viewDidLoad()
+    }
+    
+    // MARK: - Public Methods
+    func updateUserDetails(name: String, loginName: String, bio: String) {
+        nameLabel.text = name
+        loginNameLabel.text = loginName
+        descriptionLabel.text = bio
+    }
+    
+    func updateAvatar(with url: URL) {
+        avatarImageView.kf.indicatorType = .activity
+        let processor = DownsamplingImageProcessor(size: avatarImageView.bounds.size)
         
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            guard let self = self else { return }
-            self.updateAvatar()
-        }
-        updateAvatar()
-        
-        addGradientLayer()
+        avatarImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "person.crop.circle.fill"),
+            options: [
+                .processor(processor),
+                .transition(.fade(1))
+            ])
     }
     
     // MARK: - Private Methods
@@ -103,57 +110,6 @@ final class ProfileViewController: UIViewController {
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: avatarImageView.centerYAnchor)
         ])
-    }
-    
-    private func updateProfileDetails(profile: Profile) {
-        nameLabel.text = profile.name
-        loginNameLabel.text = profile.loginName
-        descriptionLabel.text = profile.bio
-    }
-    
-    private func updateAvatar() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
-        avatarImageView.kf.indicatorType = .activity
-        let processor = DownsamplingImageProcessor(size: avatarImageView.bounds.size)
-        avatarImageView.kf.setImage(
-            with: url,
-            placeholder: UIImage(named: "person.crop.circle.fill"),
-            options: [
-                .processor(processor),
-                .transition(.fade(1))
-            ])
-    }
-    
-    private func addGradientLayer() {
-        gradientLayer = CAGradientLayer()
-        
-        gradientLayer?.frame = avatarImageView.bounds
-        gradientLayer?.colors = [
-            UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
-            UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
-            UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
-        ]
-        
-        gradientLayer?.startPoint = CGPoint(x: 0, y: 0.5)
-        gradientLayer?.endPoint = CGPoint(x: 1, y: 0.5)
-        
-        if let gradientLayer = gradientLayer {
-            avatarImageView.layer.addSublayer(gradientLayer)
-            animateGradientLayer(gradientLayer)
-        }
-    }
-    
-    private func animateGradientLayer(_ layer: CAGradientLayer) {
-        let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
-        gradientChangeAnimation.duration = 1.0
-        gradientChangeAnimation.repeatCount = .infinity
-        gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
-        gradientChangeAnimation.toValue = [0, 0.8, 1]
-        
-        layer.add(gradientChangeAnimation, forKey: "locationsChange")
     }
     
     @objc
