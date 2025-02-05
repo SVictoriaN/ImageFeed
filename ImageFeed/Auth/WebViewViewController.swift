@@ -14,9 +14,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     
     // MARK: - Properties
     weak var delegate: WebViewViewControllerDelegate?
-    private var isLoading = false
     private var estimatedProgressObservation: NSKeyValueObservation?
-    
     var presenter: WebViewPresenterProtocol?
     
     // MARK: - Lifecycle Methods
