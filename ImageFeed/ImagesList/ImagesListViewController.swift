@@ -1,15 +1,15 @@
 import UIKit
 import Kingfisher
 
-final class ImagesListViewController: UIViewController {
+final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
     @IBOutlet weak var tableView: UITableView!
     
+    var presenter: ImagesListPresenterProtocol?
+    var imagesListServiceObserver: NSObjectProtocol?
     //private let photosName: [String] = Array(0..<20).map{ "\($0)" }
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
-    private var imagesListServiceObserver: NSObjectProtocol?
-    private var gradientLayer: CAGradientLayer?
     
     private let iso8601DateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -22,27 +22,6 @@ final class ImagesListViewController: UIViewController {
         return formatter
     }()
     
-    private let placeholderView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        let imageView = UIImageView(image: UIImage(named: "placeholder"))
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(imageView)
-        
-        NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            imageView.widthAnchor.constraint(equalToConstant: 100), 
-            imageView.heightAnchor.constraint(equalToConstant: 100)
-        ])
-        
-        return view
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -50,20 +29,7 @@ final class ImagesListViewController: UIViewController {
         tableView.delegate = self
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         
-        imagesListService.fetchPhotosNextPage { _ in }
-        
-        imagesListServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ImagesListService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] notification in
-                guard let self = self else { return }
-                print(">>> [ImagesListViewController] Notification received, updating photos")
-                self.updateTableViewAnimated()
-            }
-        
-        setupPlaceholderView()
+        presenter?.viewDidLoad()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -84,39 +50,10 @@ final class ImagesListViewController: UIViewController {
         }
     }
     
-    
-    func updateTableViewAnimated() {
-        let oldCount = photos.count
-        photos = imagesListService.photos
-        let newCount = photos.count
-        
-        if oldCount != newCount {
-            tableView.performBatchUpdates {
-                if oldCount < newCount {
-                    let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
-                    tableView.insertRows(at: indexPaths, with: .automatic)
-                } else {
-                    let indexPaths = (newCount..<oldCount).map { IndexPath(row: $0, section: 0) }
-                    tableView.deleteRows(at: indexPaths, with: .automatic)
-                }
-            } completion: { _ in }
-        }
-        
-        tableView.reloadData()
-        updatePlaceholderVisibility()
-    }
-    
-    private func setupPlaceholderView() {
-        view.addSubview(placeholderView)
-        
-        NSLayoutConstraint.activate([
-            placeholderView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            placeholderView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            placeholderView.topAnchor.constraint(equalTo: view.topAnchor),
-            placeholderView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-        
-        placeholderView.isHidden = true
+    func updateTableViewAnimated(indexPaths: [IndexPath]) {
+        tableView.performBatchUpdates {
+            tableView.insertRows(at: indexPaths, with: .automatic)
+        } completion: { _ in }
     }
     
     @objc private func didChangePhotos(notification: Notification) {
@@ -129,10 +66,9 @@ final class ImagesListViewController: UIViewController {
     }
 }
 
-
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return photos.count
+        presenter?.photosCount() ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -152,9 +88,9 @@ extension ImagesListViewController: UITableViewDataSource {
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let photo = photos[indexPath.row]
+        let photo = photos
         
-        if let url = URL(string: photo.thumbImageURL) {
+        if let url = presenter?.getLargeImageUrl(for: indexPath) {
             cell.cellImage.kf.setImage(with: url, placeholder: UIImage(named: "Stub"), options: [.transition(.fade(0.2))])
         } else {
             cell.cellImage.image = UIImage(named: "Stub")
@@ -162,13 +98,17 @@ extension ImagesListViewController {
         
         cell.cellImage.kf.indicatorType = .activity
         
-        if let createdAt = photo.createdAt {
+        if let createdAt = presenter?.getPhotoCreationDate(for: indexPath) {
             cell.dateLabel.text = toFormattedDate(from: createdAt) ?? "Неверная дата"
         } else {
             cell.dateLabel.text = ""
         }
         
-        cell.setIsLiked(photo.isLiked)
+        if let isLiked = presenter?.isPhotoLiked(with: indexPath) {
+            cell.setIsLiked(isLiked)
+        } else {
+            cell.setIsLiked(false)
+        }
     }
     
     private func toFormattedDate(from dateString: String) -> String? {
@@ -183,25 +123,24 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell,forRowAt indexPath: IndexPath) {
-        guard indexPath.row == photos.count - 1 else {return}
-        imagesListService.fetchPhotosNextPage { _ in }
+        let testMode = ProcessInfo.processInfo.arguments.contains("testMode")
+        if !testMode {
+            guard indexPath.row + 1 == presenter?.photosCount() else { return }
+            presenter?.loadPhotosPage()
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let image = photos[indexPath.row]
+        guard let image = presenter?.getSizeOfImage(for: indexPath) else {
+                return 0
+            }
         
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-        let imageWidth = image.size.width
+        let imageWidth = image.width
         let scale = imageViewWidth / imageWidth
-        let cellHeight = image.size.height * scale + imageInsets.top + imageInsets.bottom
+        let cellHeight = image.height * scale + imageInsets.top + imageInsets.bottom
         return cellHeight
-    }
-    
-    private func updatePlaceholderVisibility() {
-        let hasPhotos = !photos.isEmpty
-        placeholderView.isHidden = hasPhotos 
-        tableView.isHidden = !hasPhotos
     }
 }
 
