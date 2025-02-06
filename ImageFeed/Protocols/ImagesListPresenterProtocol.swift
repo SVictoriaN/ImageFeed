@@ -10,4 +10,5 @@ public protocol ImagesListPresenterProtocol: AnyObject {
     func getSizeOfImage(for indexPath: IndexPath) -> CGSize
     func getPhotoCreationDate(for indexPath: IndexPath) -> String?
     func isPhotoLiked(with indexPath: IndexPath) -> Bool
+    func changeLike(for indexPath: IndexPath, _ completion: @escaping (Result<Bool, Error>) -> Void)
 }

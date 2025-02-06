@@ -62,6 +62,21 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
     
     func isPhotoLiked(with indexPath: IndexPath) -> Bool {
-            photos[indexPath.row].isLiked
+        photos[indexPath.row].isLiked
+    }
+    
+    func changeLike(for indexPath: IndexPath, _ completion: @escaping (Result<Bool, Error>) -> Void) {
+        let photo = photos[indexPath.row]
+        service.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                photos = service.photos
+                let isLiked = photos[indexPath.row].isLiked
+                completion(.success(isLiked))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
+    }
 }

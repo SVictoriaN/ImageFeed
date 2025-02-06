@@ -42,8 +42,11 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
                 return
             }
             
-            let imageUrl = photos[indexPath.row] .largeImageURL
-            viewController.fullImageURL = imageUrl
+            if let imageUrl = presenter?.getLargeImageUrl(for: indexPath) {
+                viewController.fullImageURL = imageUrl.absoluteString // Преобразуем URL в String
+            } else {
+                viewController.fullImageURL = nil // Обрабатываем случай, если URL не удалось получить
+            }
             
         } else {
             super.prepare(for: segue, sender: sender)
@@ -132,8 +135,8 @@ extension ImagesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard let image = presenter?.getSizeOfImage(for: indexPath) else {
-                return 0
-            }
+            return 0
+        }
         
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
@@ -147,14 +150,13 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let photo = photos[indexPath.row]
+        //let photo = photos[indexPath.row]
         
         UIBlockingProgressHUD.show()
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
+        presenter?.changeLike(for: indexPath) { [weak self] result in
             switch result {
-            case .success:
-                self.photos = self.imagesListService.photos
-                cell.setIsLiked(self.photos[indexPath.row].isLiked)
+            case .success(let isPhotoLiked):
+                cell.setIsLiked(isPhotoLiked)
                 UIBlockingProgressHUD.dismiss()
             case .failure:
                 UIBlockingProgressHUD.dismiss()
@@ -168,7 +170,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 }
                 alert.addAction(action)
                 
-                self.present(alert, animated: true)
+                self?.present(alert, animated: true)
             }
         }
     }

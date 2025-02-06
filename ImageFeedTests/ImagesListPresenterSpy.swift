@@ -2,7 +2,6 @@ import ImageFeed
 import Foundation
 
 final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
-
     var view: ImagesListViewControllerProtocol?
     var viewDidLoadCalled: Bool = false
 
@@ -23,4 +22,6 @@ final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
     func getPhotoCreationDate(for indexPath: IndexPath) -> String? { nil }
 
     func isPhotoLiked(with indexPath: IndexPath) -> Bool { false }
+    
+    func changeLike(for indexPath: IndexPath, _ completion: @escaping (Result<Bool, any Error>) -> Void) {}
 }
