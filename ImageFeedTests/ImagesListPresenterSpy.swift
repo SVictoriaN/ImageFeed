@@ -2,6 +2,7 @@ import ImageFeed
 import Foundation
 
 final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
+    var photosCount: Int = 0
     var view: ImagesListViewControllerProtocol?
     var viewDidLoadCalled: Bool = false
 
@@ -10,8 +11,6 @@ final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
     }
 
     func loadPhotosPage() {}
-
-    func photosCount() -> Int { 0 }
 
     func getThumbImageUrl(for indexPath: IndexPath) -> URL? { nil }
 

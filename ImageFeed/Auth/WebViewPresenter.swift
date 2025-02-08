@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 
 enum WebViewConstants {
     static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"

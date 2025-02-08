@@ -6,7 +6,6 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     
     var presenter: ImagesListPresenterProtocol?
     var imagesListServiceObserver: NSObjectProtocol?
-    //private let photosName: [String] = Array(0..<20).map{ "\($0)" }
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
@@ -43,9 +42,9 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
             }
             
             if let imageUrl = presenter?.getLargeImageUrl(for: indexPath) {
-                viewController.fullImageURL = imageUrl.absoluteString // Преобразуем URL в String
+                viewController.fullImageURL = imageUrl.absoluteString
             } else {
-                viewController.fullImageURL = nil // Обрабатываем случай, если URL не удалось получить
+                viewController.fullImageURL = nil
             }
             
         } else {
@@ -71,7 +70,7 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        presenter?.photosCount() ?? 0
+        presenter?.photosCount ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -91,8 +90,6 @@ extension ImagesListViewController: UITableViewDataSource {
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let photo = photos
-        
         if let url = presenter?.getLargeImageUrl(for: indexPath) {
             cell.cellImage.kf.setImage(with: url, placeholder: UIImage(named: "Stub"), options: [.transition(.fade(0.2))])
         } else {
@@ -128,7 +125,7 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell,forRowAt indexPath: IndexPath) {
         let testMode = ProcessInfo.processInfo.arguments.contains("testMode")
         if !testMode {
-            guard indexPath.row + 1 == presenter?.photosCount() else { return }
+            guard indexPath.row + 1 == presenter?.photosCount else { return }
             presenter?.loadPhotosPage()
         }
     }
@@ -150,7 +147,6 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        //let photo = photos[indexPath.row]
         
         UIBlockingProgressHUD.show()
         presenter?.changeLike(for: indexPath) { [weak self] result in

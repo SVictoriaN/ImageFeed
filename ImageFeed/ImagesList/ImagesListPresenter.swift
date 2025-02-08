@@ -4,6 +4,9 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
     private let service = ImagesListService.shared
     var photos: [Photo] = []
+    var photosCount: Int {
+        photos.count
+    }
     
     func viewDidLoad() {
         loadPhotosPage()
@@ -35,17 +38,11 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
     
     func getLargeImageUrl(for indexPath: IndexPath) -> URL? {
-        guard let url = URL(string: photos[indexPath.row].largeImageURL) else { return nil }
-        return url
-    }
-    
-    func photosCount() -> Int {
-        photos.count
+        URL(string: photos[indexPath.row].largeImageURL)
     }
     
     func getThumbImageUrl(for indexPath: IndexPath) -> URL? {
-        guard let url = URL(string: photos[indexPath.row].thumbImageURL) else { return nil }
-        return url
+       URL(string: photos[indexPath.row].thumbImageURL)
     }
     
     func getSizeOfImage(for indexPath: IndexPath) -> CGSize {
@@ -55,10 +52,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
     
     func getPhotoCreationDate(for indexPath: IndexPath) -> String? {
-        guard
-            let creationDate = photos[indexPath.row].createdAt
-        else { return nil }
-        return creationDate
+        photos[indexPath.row].createdAt
     }
     
     func isPhotoLiked(with indexPath: IndexPath) -> Bool {

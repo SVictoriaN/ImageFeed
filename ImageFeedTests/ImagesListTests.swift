@@ -30,7 +30,7 @@ final class ImageFeedImagesListTests: XCTestCase {
         
         presenter.photos = [photo]
         
-        XCTAssertEqual(presenter.photosCount(), 1)
+        XCTAssertEqual(presenter.photosCount, 1)
         XCTAssertEqual(presenter.getThumbImageUrl(for: indexPath), URL(string: photo.thumbImageURL))
         XCTAssertEqual(presenter.getLargeImageUrl(for: indexPath), URL(string: photo.largeImageURL))
         XCTAssertEqual(presenter.getSizeOfImage(for: indexPath), photo.size)
