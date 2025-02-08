@@ -16,7 +16,7 @@ final class ImagesListCell: UITableViewCell {
     weak var delegate: ImagesListCellDelegate?
     
     private var isLiked: Bool = false
-
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         
@@ -29,7 +29,8 @@ final class ImagesListCell: UITableViewCell {
     
     func setIsLiked(_ liked: Bool) {
         isLiked = liked
-        let likeImage = liked ? UIImage(named: "like_button_on") : UIImage(named: "like_button_off")
+        let likeImage =  UIImage(named: isLiked ? "like_button_on" : "like_button_off")
+        likeButton.accessibilityIdentifier = isLiked ? "like button on" : "like button off"
         likeButton.setImage(likeImage, for: .normal)
     }
 }

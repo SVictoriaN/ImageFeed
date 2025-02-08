@@ -10,7 +10,7 @@ final class ProfileImageService {
     
     // MARK: - Properties
     private var task: URLSessionTask?
-    private(set) var avatarURL: String?
+    var avatarURL: String?
     
     // MARK: - Private Methods
     private func makeProfileImageRequest(username: String) -> URLRequest? {

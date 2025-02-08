@@ -7,7 +7,7 @@ final class ProfileService {
     
     // MARK: - Properties
     private var task: URLSessionTask?
-    private(set) var profile: Profile?
+    var profile: Profile?
     
     // MARK: - Private Methods
     private func makeProfileServiceRequest(token: String) -> URLRequest? {
